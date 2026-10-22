@@ -350,7 +350,7 @@ function sample(){
 /* ---------- Conexión (Firebase Realtime Database por REST) ---------- */
 // Pega aquí la URL de tu base, p. ej. 'https://mi-torneo-default-rtdb.firebaseio.com'
 // Vacío = modo local: los datos solo existen en este navegador.
-const DB_URL='';
+const DB_URL='https://torneo-escondite-default-rtdb.firebaseio.com';
 const LOCAL=!DB_URL, base=DB_URL.replace(/\/+$/,'');
 let S={groups:[],clans:[],rounds:[],day1Closed:false}, REV=0, ADMIN=false, ADMIN_REC=null;
 const KEY='torneo:key';
