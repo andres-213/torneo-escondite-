@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DEVIL FEST, REBIRTH OF THE DEVIL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: póster de torneo — cabecera con título en llamas, pestañas, paneles con borde neón rojo sobre negro */
+:root{
+  --bg:#0b0405; --panel:#160709; --panel-2:#1f0a0d; --line:#5a1219;
+  --red:#ff2a3a; --red-deep:#b3101e; --gold:#f5c542; --fg:#f4ecec; --muted:#c7a9ab; --ok:#4fd18b;
+  --display:"Anton","Impact","Arial Narrow",sans-serif;
+  --cond:"Barlow Condensed","Arial Narrow",sans-serif;
+  --body:"Barlow",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body:not(.is-admin) .admin-only{display:none!important}
+.authbar{justify-content:flex-end;font-family:var(--cond);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:var(--muted);margin-bottom:10px}
+.authbar b{color:var(--gold)}
+.authpanel{margin-bottom:18px}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;
+  background-image:radial-gradient(ellipse at 50% -10%,rgba(255,42,58,.28),transparent 60%),radial-gradient(ellipse at 0% 100%,rgba(179,16,30,.18),transparent 50%);
+  background-attachment:fixed;min-height:100%}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{text-align:center;padding-block:10px 18px}
+.crown{width:54px;height:auto;display:block;margin:0 auto 4px;filter:drop-shadow(0 0 10px rgba(245,197,66,.5))}
+h1{font-family:var(--display);font-weight:400;margin:0;line-height:.92;text-transform:uppercase;letter-spacing:.01em;text-wrap:balance}
+h1 .l1,h1 .l3{display:block;font-size:clamp(30px,6vw,56px);color:#e9e2e2;text-shadow:0 3px 0 #000,0 0 18px rgba(255,255,255,.15)}
+h1 .l2{display:block;font-size:clamp(56px,13vw,124px);color:var(--red);transform:skew(-6deg);
+  text-shadow:0 4px 0 #3a0006,0 0 22px rgba(255,42,58,.75),0 0 60px rgba(255,42,58,.35)}
+.sub{font-family:var(--cond);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-size:13px;margin-top:10px}
+
+nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:6px 0 22px}
+nav button{font-family:var(--cond);font-weight:800;font-size:16px;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--panel);color:var(--muted);border:1px solid var(--line);padding:10px 18px;border-radius:6px;cursor:pointer;transform:skew(-6deg)}
+nav button span{display:inline-block;transform:skew(6deg)}
+nav button[aria-selected="true"]{background:linear-gradient(180deg,var(--red),var(--red-deep));color:#fff;border-color:var(--red);box-shadow:0 0 18px rgba(255,42,58,.5)}
+nav button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+.panel{background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--red-deep);border-radius:12px;padding:18px;
+  box-shadow:0 0 0 1px rgba(255,42,58,.12) inset,0 0 26px rgba(255,42,58,.18);min-width:0}
+.stack{display:flex;flex-direction:column;gap:18px}
+h2{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:clamp(24px,3.4vw,34px);margin:0;line-height:1;
+  transform:skew(-5deg);color:#efe7e7;text-shadow:0 2px 0 #000,0 0 14px rgba(255,42,58,.45)}
+.tag{display:inline-block;margin-top:8px;font-family:var(--cond);font-weight:700;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;
+  background:#000;border:1px solid var(--line);padding:3px 10px;border-radius:4px;color:var(--muted)}
+h3{font-family:var(--cond);font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:20px;color:var(--red);margin:0}
+
+.rule{display:grid;grid-template-columns:46px 1fr auto;gap:14px;align-items:center;background:#0d0405;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.rule svg{width:40px;height:40px}
+.rule b{font-family:var(--cond);font-weight:800;text-transform:uppercase;font-size:18px;letter-spacing:.03em;display:block;line-height:1.1}
+.rule small{color:var(--muted);font-size:13.5px}
+.pts{min-width:82px;text-align:center;font-family:var(--display);font-size:30px;line-height:1;color:#fff;
+  background:linear-gradient(180deg,#5a0a12,#2a0307);border:1px solid var(--red);border-radius:8px;padding:6px 8px;transform:skew(-6deg)}
+.pts em{display:block;font-style:normal;font-family:var(--cond);font-weight:800;font-size:12px;letter-spacing:.1em;color:var(--muted)}
+.pts.gold{color:var(--gold);border-color:var(--gold);font-size:22px}
+.rules{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.note{border:1px dashed var(--red);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--fg);background:rgba(255,42,58,.06)}
+.note strong{color:var(--red)}
+
+.days{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+@media (max-width:480px){.days{grid-template-columns:1fr}}
+.day{background:#0d0405;border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.day .dh{font-family:var(--display);font-size:22px;text-transform:uppercase}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-family:var(--cond);font-weight:800;text-transform:uppercase;font-size:13px;letter-spacing:.05em;border:1px solid var(--red);border-radius:5px;padding:3px 8px;color:#fff}
+.chip.dim{border-color:var(--line);color:var(--muted)}
+.day p{margin:0;font-size:13.5px;color:var(--muted)}
+.day p strong{color:var(--red)}
+ul.check{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+ul.check li{display:flex;gap:8px}
+ul.check li::before{content:"✓";flex:0 0 18px;height:18px;border-radius:50%;background:var(--red);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;margin-top:1px}
+
+.tbl-wrap{overflow-x:auto;margin-top:12px;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th{font-family:var(--cond);font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--gold);text-align:left;padding:8px 10px;background:#070203;border-bottom:1px solid var(--red-deep)}
+td{padding:7px 10px;border-bottom:1px solid #2a0a0e}
+tr:last-child td{border-bottom:0}
+td.p{color:var(--red);font-weight:700;text-align:center}
+th.c,td.c{text-align:center}
+
+/* leaderboard */
+.board-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.lb{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.lb-row{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;background:#0d0405;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.lb-row .rk{font-family:var(--display);font-size:26px;text-align:center;color:var(--muted)}
+.lb-row.top{border-color:var(--gold);box-shadow:0 0 18px rgba(245,197,66,.25)}
+.lb-row.top .rk{color:var(--gold)}
+.lb-row.out{opacity:.5}
+.lb-row .nm{min-width:0}
+.lb-row .nm b{font-family:var(--cond);font-weight:800;font-size:19px;text-transform:uppercase;letter-spacing:.02em;display:block;overflow-wrap:anywhere}
+.lb-row .nm small{color:var(--muted);font-size:13px}
+.lb-row .tot{font-family:var(--display);font-size:30px;color:#fff;text-align:right;line-height:1}
+.lb-row .tot em{display:block;font-style:normal;font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:.12em;color:var(--muted)}
+.pill{display:inline-block;font-family:var(--cond);font-weight:800;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;border-radius:4px;padding:1px 7px;margin-left:6px;vertical-align:2px}
+.pill.out{background:#3a0a0f;color:#ff8a93;border:1px solid var(--red-deep)}
+.pill.win{background:var(--gold);color:#1a0d00}
+.empty{color:var(--muted);text-align:center;padding:22px 10px;border:1px dashed var(--line);border-radius:10px;font-size:14px}
+
+/* forms */
+label{font-family:var(--cond);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px;min-width:0}
+input,select{font:inherit;font-size:15px;background:#070203;color:var(--fg);border:1px solid var(--line);border-radius:7px;padding:9px 10px;width:100%;min-width:0}
+input[type=number]{width:70px;text-align:center}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--red)}
+.form{display:grid;gap:10px;margin-top:12px}
+.form.cols{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:end}
+.btn{font-family:var(--cond);font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:15px;cursor:pointer;
+  background:linear-gradient(180deg,var(--red),var(--red-deep));color:#fff;border:1px solid var(--red);border-radius:7px;padding:10px 16px}
+.btn:hover{filter:brightness(1.12)}
+.btn.ghost{background:transparent;color:var(--fg);border-color:var(--line)}
+.btn.gold{background:linear-gradient(180deg,#f7d064,#c99a1c);color:#1a0d00;border-color:var(--gold)}
+.btn.sm{font-size:12.5px;padding:5px 10px}
+.btn.warn{background:#2a0307;border-color:var(--red);color:#ff8a93}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.group-card{background:#0d0405;border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.group-card header{all:unset;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.group-card .gname{font-family:var(--display);font-size:22px;text-transform:uppercase}
+.clan-line{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-top:1px solid #2a0a0e;font-size:14px}
+.clan-line span{min-width:0;overflow-wrap:anywhere}
+.clan-line small{color:var(--muted)}
+.groups-list{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+
+.round-rows{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.rr{display:grid;grid-template-columns:1fr auto auto auto auto auto;gap:12px;align-items:center;background:#0d0405;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.rr .nm b{font-family:var(--cond);font-weight:800;font-size:17px;text-transform:uppercase;display:block}
+.rr .nm small{color:var(--muted);font-size:12.5px}
+.rr .f{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--cond);font-weight:700;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{font-family:var(--cond);font-weight:800;font-size:14px;background:#070203;color:var(--muted);border:0;padding:6px 10px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--red);color:#fff}
+.rr .live{font-family:var(--display);font-size:24px;min-width:56px;text-align:right;color:var(--gold)}
+@media (max-width:760px){.rr{grid-template-columns:1fr 1fr 1fr;}.rr .nm{grid-column:1/-1}.rr .live{grid-column:1/-1;text-align:left}}
+.hist{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.hist-item{background:#0d0405;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.hist-item .hh{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.hist-item .hh b{font-family:var(--cond);font-weight:800;text-transform:uppercase;font-size:16px}
+.hist-item ul{margin:6px 0 0;padding-left:18px;font-size:13.5px;color:var(--muted)}
+.hist-item ul strong{color:var(--fg)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--gold);
+  font-family:var(--cond);font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:10px 18px;border-radius:8px;z-index:20;box-shadow:0 0 22px rgba(245,197,66,.3)}
+.hint{font-size:13px;color:var(--muted);margin:6px 0 0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="authbar row-actions" id="authBar"></div>
+  <div class="panel authpanel" id="authPanel" hidden>
+    <h2 id="authTitle">Acceso de administrador</h2>
+    <p class="hint" id="authHint"></p>
+    <form class="form cols" id="formAuth">
+      <label for="aPass">Clave de administrador<input id="aPass" type="password" autocomplete="current-password" required></label>
+      <div class="row-actions"><button class="btn" type="submit" id="authSubmit">Entrar</button><button class="btn ghost" type="button" id="btnAuthCancel">Cancelar</button></div>
+    </form>
+  </div>
+  <div class="note" id="localNote" hidden style="margin-bottom:12px">Modo local: falta configurar la base de datos (<b>DB_URL</b> en este archivo). Los datos solo se ven en este navegador.</div>
+  <header>
+    <svg class="crown" viewBox="0 0 64 40" aria-hidden="true"><path d="M4 34 8 10l14 12L32 4l10 18 14-12 4 24z" fill="#f5c542" stroke="#8a5a00" stroke-width="2"/><rect x="4" y="33" width="56" height="6" rx="2" fill="#d9a62a"/><circle cx="32" cy="22" r="4" fill="#ff2a3a"/></svg>
+    <h1><span class="l1">Torneo de</span><span class="l2">Escondite</span><span class="l3">en Parejas</span></h1>
+    <div class="sub" id="subline">2 días · 2 grupos · puntos acumulados</div>
+  </header>
+
+  <nav role="tablist" id="tabs">
+    <button role="tab" data-tab="tabla" aria-selected="true"><span>Tabla</span></button>
+    <button role="tab" data-tab="ronda" aria-selected="false" class="admin-only"><span>Registrar ronda</span></button>
+    <button role="tab" data-tab="grupos" aria-selected="false" class="admin-only"><span>Grupos y parejas</span></button>
+    <button role="tab" data-tab="reglas" aria-selected="false"><span>Reglas</span></button>
+  </nav>
+
+  <!-- TABLA -->
+  <section id="tab-tabla" class="grid2">
+    <div class="panel">
+      <div class="board-head">
+        <div><h2>Tabla de puntos</h2><span class="tag">Los puntos se suman durante los 2 días</span></div>
+        <label style="max-width:190px">Ver
+          <select id="lbFilter"><option value="all">Todos los grupos</option></select>
+        </label>
+      </div>
+      <div class="lb" id="leaderboard"></div>
+    </div>
+    <div class="stack">
+      <div class="panel admin-only">
+        <h2>Control del torneo</h2>
+        <span class="tag" id="dayTag">Día 1 en curso</span>
+        <div class="form cols">
+          <label for="elimCount">Parejas a eliminar
+            <input type="number" id="elimCount" value="4" min="0" style="width:100%">
+          </label>
+          <button class="btn" id="btnCloseDay">Cerrar día 1</button>
+        </div>
+        <p class="hint" id="closeHint">Al cerrar el día 1 se eliminan las últimas parejas de la tabla entre las que compitieron ese día.</p>
+        <div class="row-actions" id="closeConfirm" hidden style="margin-top:10px">
+          <span style="font-size:14px" id="closeMsg"></span>
+          <button class="btn sm warn" id="btnCloseYes">Sí, eliminar</button>
+          <button class="btn sm ghost" id="btnCloseNo">Cancelar</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Historial de rondas</h2>
+        <div class="hist" id="history"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RONDA -->
+  <section id="tab-ronda" class="admin-only" hidden>
+    <div class="panel">
+      <h2>Registrar ronda</h2>
+      <span class="tag">Marca quién sobrevivió y cuántas kills hizo cada pareja</span>
+      <div class="form cols">
+        <label for="rGroup">Grupo<select id="rGroup"></select></label>
+        <label for="rDay">Día<select id="rDay"><option value="1">Jueves 22 · Día 1</option><option value="2">Viernes 23 · Día 2</option></select></label>
+        <label for="rMap">Mapa<select id="rMap"><option value="Skeld">Skeld (bonus)</option><option value="Mira HQ">Mira HQ</option><option value="Polus">Polus</option><option value="Airship">Airship</option><option value="Fungle">Fungle</option><option value="Otro">Otro</option></select></label>
+      </div>
+      <div class="round-rows" id="roundRows"></div>
+      <div class="note" id="soloNote" hidden style="margin-top:12px"></div>
+      <div class="row-actions" style="margin-top:14px;justify-content:flex-end">
+        <button class="btn ghost" id="btnResetRound">Limpiar</button>
+        <button class="btn gold" id="btnSaveRound">Guardar ronda</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRUPOS -->
+  <section id="tab-grupos" class="grid2 admin-only" hidden>
+    <div class="stack">
+      <div class="panel">
+        <h2>Clave de administrador</h2>
+        <span class="tag">Cambia la clave para editar el torneo</span>
+        <form class="form cols" id="formAdmin">
+          <label for="adPass">Nueva clave<input id="adPass" type="password" autocomplete="new-password" required></label>
+          <button class="btn" type="submit">Cambiar clave</button>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Agregar grupo</h2>
+        <form class="form cols" id="formGroup">
+          <label for="gName">Nombre del grupo<input id="gName" placeholder="Grupo C" required></label>
+          <label for="gDay">Juega el<select id="gDay"><option value="1">Día 1 · Jueves 22</option><option value="2">Día 2 · Viernes 23</option></select></label>
+          <button class="btn" type="submit">Agregar grupo</button>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Agregar pareja / clan</h2>
+        <form class="form" id="formClan">
+          <label for="cName">Nombre del clan<input id="cName" placeholder="Clan Fénix" required></label>
+          <div class="form cols" style="margin:0">
+            <label for="cP1">Integrante 1<input id="cP1" placeholder="Jugador 1"></label>
+            <label for="cP2">Integrante 2<input id="cP2" placeholder="Jugador 2"></label>
+          </div>
+          <label for="cGroup">Grupo<select id="cGroup"></select></label>
+          <button class="btn" type="submit">Agregar pareja</button>
+        </form>
+      </div>
+      <div class="panel">
+        <h2>Datos</h2>
+        <p class="hint">Todo se guarda en la base de datos: quien abra el enlace ve los mismos datos.</p>
+        <div class="row-actions" style="margin-top:10px">
+          <button class="btn ghost" id="btnSample">Cargar ejemplo</button>
+          <button class="btn warn" id="btnWipe">Borrar todo</button>
+          <span id="wipeConfirm" hidden class="row-actions"><span style="font-size:14px">¿Borrar grupos, parejas y rondas?</span><button class="btn sm warn" id="btnWipeYes">Sí, borrar</button><button class="btn sm ghost" id="btnWipeNo">No</button></span>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Grupos participantes</h2>
+      <div class="groups-list" id="groupsList"></div>
+    </div>
+  </section>
+
+  <!-- REGLAS -->
+  <section id="tab-reglas" class="grid2" hidden>
+    <div class="stack">
+      <div class="panel">
+        <h2>Sistema de puntaje</h2>
+        <span class="tag">Los puntos se suman durante los 2 días</span>
+        <h3 style="margin-top:16px">Categorías principales</h3>
+        <div class="rules">
+          <div class="rule"><svg viewBox="0 0 40 40"><path d="M20 34S6 25 6 15a7 7 0 0 1 14-2 7 7 0 0 1 14 2c0 10-14 19-14 19z" fill="#ff2a3a"/></svg><div><b>Sobrevive la pareja</b><small>Ambos integrantes sobreviven hasta el final.</small></div><div class="pts">+5<em>puntos</em></div></div>
+          <div class="rule"><svg viewBox="0 0 40 40"><ellipse cx="20" cy="9" rx="9" ry="3" fill="none" stroke="#f5c542" stroke-width="2"/><circle cx="20" cy="24" r="10" fill="#ff2a3a"/></svg><div><b>Sobrevive 1 solo</b><small>Solo uno de los dos integrantes logra sobrevivir.</small></div><div class="pts">+2<em>puntos</em></div></div>
+          <div class="rule"><svg viewBox="0 0 40 40"><path d="M30 6 14 24l3 3L34 10z" fill="#e8e8e8"/><path d="M14 24l-6 8 3 2 6-7z" fill="#b3101e"/></svg><div><b>Kill por integrante</b><small>Por cada jugador eliminado.</small></div><div class="pts">+3<em>c/ kill</em></div></div>
+          <div class="rule"><svg viewBox="0 0 40 40"><circle cx="20" cy="17" r="11" fill="#eee"/><rect x="14" y="25" width="12" height="8" rx="2" fill="#eee"/><path d="M13 13l5 5M18 13l-5 5M22 13l5 5M27 13l-5 5" stroke="#111" stroke-width="2.4"/></svg><div><b>Kill a todos</b><small>La pareja elimina a todos los rivales de la ronda.</small></div><div style="display:flex;flex-direction:column;gap:6px"><div class="pts">+20<em>puntos</em></div><div class="pts gold">+10<em>recompensa</em></div></div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Bonus especial · Skeld</h2>
+        <div class="rules">
+          <div class="rule"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="11" fill="#b3101e"/><ellipse cx="20" cy="20" rx="17" ry="5" fill="none" stroke="#ff8a93" stroke-width="2" transform="rotate(-20 20 20)"/></svg><div><b>Sobrevive con tu pareja</b><small>Solo en el mapa Skeld.</small></div><div class="pts">+10<em>puntos</em></div></div>
+          <div class="rule"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="11" fill="#b3101e"/><ellipse cx="20" cy="20" rx="17" ry="5" fill="none" stroke="#ff8a93" stroke-width="2" transform="rotate(-20 20 20)"/></svg><div><b>Sobrevive solo</b><small>Solo en el mapa Skeld.</small></div><div class="pts">+5<em>puntos</em></div></div>
+          <div class="rule"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="11" fill="#b3101e"/><ellipse cx="20" cy="20" rx="17" ry="5" fill="none" stroke="#ff8a93" stroke-width="2" transform="rotate(-20 20 20)"/></svg><div><b>Solo participó</b><small>Solo en el mapa Skeld.</small></div><div class="pts">+1<em>punto</em></div></div>
+          <div class="note">★ Si sobrevive un <strong>único tripulante</strong> en toda la ronda, se le toma como puntaje de pareja: <strong>+5 puntos</strong> en vez de los +2 que le corresponderían.</div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel">
+        <h2>Formato del torneo</h2>
+        <span class="tag">2 días · 2 grupos diferentes</span>
+        <div class="days">
+          <div class="day"><div class="dh">Primer día</div><div class="chips"><span class="chip">Jueves 22 Oct</span><span class="chip dim" id="fmtA">Grupo A</span></div><p>Todas las parejas compiten y se registran sus puntos.</p><p>Al final del primer día <strong>las 4 últimas parejas</strong> de la tabla serán eliminadas del torneo.</p></div>
+          <div class="day"><div class="dh">Segundo día</div><div class="chips"><span class="chip">Viernes 23 Oct</span><span class="chip dim" id="fmtB">Grupo B</span></div><p>Las parejas restantes compiten y continúan sumando puntos.</p><p><strong>Gana el clan</strong> que tenga el mejor puntaje acumulado de ambos días.</p></div>
+        </div>
+        <h3 style="margin-top:18px">Importante</h3>
+        <ul class="check">
+          <li>La tabla de puntos NO se reinicia, se suman los puntos de ambos días.</li>
+          <li>El primer día se eliminan las 4 últimas parejas de la tabla.</li>
+          <li>El segundo día compiten solo las parejas que continúan en el torneo.</li>
+          <li>El clan ganador será el que tenga el mayor puntaje total acumulado.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h2>Ejemplo de puntaje</h2>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Acción</th><th class="c">Puntos</th><th>Notas</th></tr></thead>
+          <tbody>
+            <tr><td>Sobrevive la pareja</td><td class="p">+5</td><td>Al final de la ronda</td></tr>
+            <tr><td>Sobrevive 1 solo</td><td class="p">+2</td><td>Al final de la ronda</td></tr>
+            <tr><td>Kill por integrante</td><td class="p">+3</td><td>Por cada eliminación</td></tr>
+            <tr><td>Kill a todos</td><td class="p">+20</td><td>Bono por eliminar a todos</td></tr>
+            <tr><td>Recompensa</td><td class="p">+10</td><td>Adicional al matar a todos</td></tr>
+            <tr><td>Bonus Skeld (pareja)</td><td class="p">+10</td><td>Solo en el mapa Skeld</td></tr>
+            <tr><td>Bonus Skeld (1 solo)</td><td class="p">+5</td><td>Solo en el mapa Skeld</td></tr>
+            <tr><td>Bonus Skeld (solo participó)</td><td class="p">+1</td><td>Solo en el mapa Skeld</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script>
+const uid=()=>Math.random().toString(36).slice(2,10);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function sample(){
+  const gA={id:uid(),name:'Grupo A',day:1}, gB={id:uid(),name:'Grupo B',day:2};
+  const mk=(n,g,a,b)=>({id:uid(),name:n,p1:a,p2:b,groupId:g.id,eliminated:false});
+  const clans=[mk('Clan Fénix',gA,'Jugador 1','Jugador 2'),mk('Clan Sombra',gA,'Jugador 3','Jugador 4'),mk('Clan Corona',gA,'Jugador 5','Jugador 6'),
+    mk('Clan Daga',gA,'Jugador 7','Jugador 8'),mk('Clan Eclipse',gA,'Jugador 9','Jugador 10'),
+    mk('Clan Cadenas',gB,'Jugador 11','Jugador 12'),mk('Clan Rubí',gB,'Jugador 13','Jugador 14'),mk('Clan Halo',gB,'Jugador 15','Jugador 16'),mk('Clan Vórtice',gB,'Jugador 17','Jugador 18')];
+  const r=(c,s,k,ka=false)=>({clanId:c.id,surv:s,kills:k,killAll:ka,played:true});
+  const rounds=[
+    {id:uid(),groupId:gA.id,day:1,map:'Skeld',ts:Date.now()-7200e3,results:[r(clans[0],2,1),r(clans[1],0,2),r(clans[2],1,0),r(clans[3],0,1),r(clans[4],0,0)]},
+    {id:uid(),groupId:gA.id,day:1,map:'Polus',ts:Date.now()-3600e3,results:[r(clans[0],0,0),r(clans[1],1,0),r(clans[2],0,3),r(clans[3],0,0),r(clans[4],0,1)]},
+  ];
+  return {sample:true,groups:[gA,gB],clans,rounds,day1Closed:false};
+}
+
+/* ---------- Conexión (Firebase Realtime Database por REST) ---------- */
+// Pega aquí la URL de tu base, p. ej. 'https://mi-torneo-default-rtdb.firebaseio.com'
+// Vacío = modo local: los datos solo existen en este navegador.
+const DB_URL='';
+const LOCAL=!DB_URL, base=DB_URL.replace(/\/+$/,'');
+let S={groups:[],clans:[],rounds:[],day1Closed:false}, REV=0, ADMIN=false, HASH=null;
+const KEY='torneo:key';
+const keep=h=>{try{h?localStorage.setItem(KEY,h):localStorage.removeItem(KEY)}catch(e){}};
+const kept=()=>{try{return localStorage.getItem(KEY)}catch(e){return null}};
+async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('torneo-escondite:'+t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function dbGet(path){
+  if(LOCAL){try{return JSON.parse(localStorage.getItem('torneo:'+path))}catch(e){return null}}
+  const r=await fetch(`${base}/${path}.json`,{cache:'no-store'});
+  if(!r.ok)throw new Error('http '+r.status);
+  return r.json();
+}
+async function dbPut(path,val){
+  if(LOCAL){localStorage.setItem('torneo:'+path,JSON.stringify(val));return}
+  const r=await fetch(`${base}/${path}.json`,{method:'PUT',body:JSON.stringify(val)});
+  if(!r.ok)throw new Error('http '+r.status);
+}
+async function load(){
+  const [t,h]=await Promise.all([dbGet('torneo'),dbGet('adminHash')]);
+  HASH=h||null;
+  const st=(t&&t.state)||{};
+  return {rev:(t&&t.rev)||0,state:{...st,groups:st.groups||[],clans:st.clans||[],rounds:st.rounds||[],day1Closed:!!st.day1Closed,sample:!!st.sample}};
+}
+let pending=0, chain=Promise.resolve();
+function save(){
+  if(!ADMIN)return;
+  pending++;
+  chain=chain.then(async()=>{
+    try{
+      const cur=await dbGet('torneo');
+      if(cur&&(cur.rev||0)!==REV){const d=await load();S=d.state;REV=d.rev;renderAll();toast('Otro admin hizo cambios: se recargaron los datos');return}
+      REV++;
+      await dbPut('torneo',{rev:REV,state:S});
+    }catch(e){toast('No se pudo guardar')}
+  }).finally(()=>pending--);
+}
+async function poll(){
+  if(pending)return;
+  try{const d=await load();if(!pending&&d.rev!==REV){S=d.state;REV=d.rev;renderAll({keepDraft:true})}}catch(e){}
+}
+
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
+
+/* ---------- Administrador ---------- */
+const isAdmin=()=>ADMIN;
+function guard(){if(isAdmin())return true;toast('Solo un administrador puede hacer esto');return false}
+
+/* ---------- Puntaje ---------- */
+function scoreRound(round){
+  const total=round.results.filter(x=>x.played).reduce((a,x)=>a+(+x.surv||0),0);
+  const skeld=round.map==='Skeld';
+  return round.results.map(x=>{
+    const items=[];let pts=0;const add=(p,t)=>{pts+=p;items.push(`${t} +${p}`)};
+    if(!x.played) return {clanId:x.clanId,pts:0,items:['No participó']};
+    if(x.surv==2)add(5,'Sobrevive la pareja');
+    else if(x.surv==1){ if(total===1)add(5,'Único tripulante (cuenta como pareja)'); else add(2,'Sobrevive 1 solo'); }
+    if(x.kills>0)add(3*x.kills,`${x.kills} kill${x.kills>1?'s':''}`);
+    if(x.killAll){add(20,'Kill a todos');add(10,'Recompensa');}
+    if(skeld){ if(x.surv==2)add(10,'Bonus Skeld pareja'); else if(x.surv==1)add(5,'Bonus Skeld solo'); else add(1,'Bonus Skeld participó'); }
+    return {clanId:x.clanId,pts,items};
+  });
+}
+function totals(){
+  const t={};S.clans.forEach(c=>t[c.id]={pts:0,rounds:0,kills:0,d1:0});
+  S.rounds.forEach(r=>scoreRound(r).forEach((s,i)=>{const o=t[s.clanId];if(!o)return;o.pts+=s.pts;if(r.results[i].played)o.rounds++;o.kills+=+r.results[i].kills||0;if(r.day==1)o.d1+=s.pts;}));
+  return t;
+}
+const groupName=id=>id==='__active'?'Todas las parejas':(S.groups.find(g=>g.id===id)||{}).name||'Sin grupo';
+
+/* ---------- Tabs ---------- */
+function showTab(name){
+  if((name==='ronda'||name==='grupos')&&!isAdmin())name='tabla';
+  document.querySelectorAll('#tabs button').forEach(x=>x.setAttribute('aria-selected',x.dataset.tab===name));
+  ['tabla','ronda','grupos','reglas'].forEach(t=>document.getElementById('tab-'+t).hidden=t!==name);
+  if(name==='ronda')buildRound();
+}
+document.getElementById('tabs').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-tab]');if(!b)return;
+  showTab(b.dataset.tab);
+});
+
+/* ---------- Acceso de administrador (una sola clave) ---------- */
+function renderAuth(){
+  const first=!HASH;
+  document.body.classList.toggle('is-admin',ADMIN);
+  document.getElementById('authBar').innerHTML=ADMIN
+    ?`<span>Modo administrador</span><button class="btn sm ghost" data-auth="logout">Cerrar sesión</button>`
+    :`<span>Modo espectador</span><button class="btn sm ghost" data-auth="show">${first?'Crear clave de administrador':'Acceso administrador'}</button>`;
+  document.getElementById('authTitle').textContent=first?'Crear clave de administrador':'Acceso de administrador';
+  document.getElementById('authHint').textContent=first?'Aún no hay clave. La primera que crees será la de administrador.':'Solo quien tiene la clave puede registrar rondas, editar grupos y manejar el torneo.';
+  document.getElementById('authSubmit').textContent=first?'Crear y entrar':'Entrar';
+  document.getElementById('aPass').autocomplete=first?'new-password':'current-password';
+  if(ADMIN)document.getElementById('authPanel').hidden=true;
+}
+document.getElementById('authBar').addEventListener('click',e=>{
+  const b=e.target.closest('[data-auth]');if(!b)return;
+  if(b.dataset.auth==='logout'){ADMIN=false;keep(null);renderAll();toast('Sesión cerrada')}
+  else{const p=document.getElementById('authPanel');p.hidden=!p.hidden;if(!p.hidden)document.getElementById('aPass').focus()}
+});
+document.getElementById('btnAuthCancel').addEventListener('click',()=>document.getElementById('authPanel').hidden=true);
+document.getElementById('formAuth').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const pw=document.getElementById('aPass').value;if(!pw)return;
+  try{
+    HASH=(await dbGet('adminHash'))||null;
+    const h=await sha(pw);
+    if(!HASH){
+      if(pw.length<4){toast('La clave debe tener al menos 4 caracteres');return}
+      await dbPut('adminHash',h);HASH=h;
+    }else if(h!==HASH){toast('Clave incorrecta');return}
+    ADMIN=true;keep(h);document.getElementById('formAuth').reset();renderAll();toast('Bienvenido, administrador');
+  }catch(err){toast('No se pudo conectar con la base de datos')}
+});
+
+/* ---------- Cambiar clave ---------- */
+document.getElementById('formAdmin').addEventListener('submit',async e=>{
+  e.preventDefault();if(!guard())return;
+  const pw=document.getElementById('adPass').value;
+  if(pw.length<4){toast('La clave debe tener al menos 4 caracteres');return}
+  try{const h=await sha(pw);await dbPut('adminHash',h);HASH=h;keep(h);e.target.reset();toast('Clave cambiada')}
+  catch(err){toast('No se pudo cambiar la clave')}
+});
+
+/* ---------- Leaderboard ---------- */
+function renderBoard(){
+  const f=document.getElementById('lbFilter');const cur=f.value;
+  f.innerHTML='<option value="all">Todos los grupos</option>'+S.groups.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('');
+  f.value=[...f.options].some(o=>o.value===cur)?cur:'all';
+  const t=totals();
+  let list=S.clans.filter(c=>f.value==='all'||c.groupId===f.value);
+  list.sort((a,b)=>(a.eliminated-b.eliminated)||(t[b.id].pts-t[a.id].pts)||(t[b.id].kills-t[a.id].kills));
+  const el=document.getElementById('leaderboard');
+  if(!list.length){el.innerHTML='<div class="empty">Aún no hay parejas. Agrégalas en <b>Grupos y parejas</b>.</div>';return}
+  const anyPts=list.some(c=>t[c.id].pts>0);
+  el.innerHTML=(S.sample?'<div class="note" style="margin-bottom:4px">Estos son <strong>datos de ejemplo</strong>. Bórralos en Grupos y parejas → Borrar todo, y agrega tus grupos reales.</div>':'')+
+  list.map((c,i)=>{const o=t[c.id];const top=i===0&&!c.eliminated&&anyPts;
+    return `<div class="lb-row ${top?'top':''} ${c.eliminated?'out':''}">
+      <div class="rk">${c.eliminated?'✕':i+1}</div>
+      <div class="nm"><b>${esc(c.name)}${top?'<span class="pill win">Líder</span>':''}${c.eliminated?'<span class="pill out">Eliminada</span>':''}</b>
+      <small>${esc(groupName(c.groupId))} · ${esc(c.p1||'—')} & ${esc(c.p2||'—')} · ${o.rounds} ronda${o.rounds==1?'':'s'} · ${o.kills} kills</small></div>
+      <div class="tot">${o.pts}<em>puntos</em></div></div>`}).join('');
+}
+document.getElementById('lbFilter').addEventListener('change',renderBoard);
+
+/* ---------- Historial ---------- */
+function renderHistory(){
+  const el=document.getElementById('history');
+  if(!S.rounds.length){el.innerHTML='<div class="empty">Sin rondas registradas. Ve a <b>Registrar ronda</b>.</div>';return}
+  const cn=id=>(S.clans.find(c=>c.id===id)||{}).name||'(pareja borrada)';
+  el.innerHTML=[...S.rounds].reverse().map((r,i)=>{const sc=scoreRound(r);const n=S.rounds.length-i;
+    return `<div class="hist-item"><div class="hh"><b>Ronda ${n} · ${esc(groupName(r.groupId))} · ${esc(r.map)} · Día ${r.day}</b>
+      ${isAdmin()?`<span class="row-actions"><button class="btn sm ghost" data-del="${r.id}">Borrar</button></span>`:''}</div>
+      <ul>${sc.filter(s=>s.pts>0).sort((a,b)=>b.pts-a.pts).map(s=>`<li><strong>${esc(cn(s.clanId))}: +${s.pts}</strong> — ${esc(s.items.join(', '))}</li>`).join('')||'<li>Nadie sumó puntos</li>'}</ul></div>`}).join('');
+}
+document.getElementById('history').addEventListener('click',e=>{
+  const b=e.target.closest('[data-del]');if(!b||!guard())return;
+  if(b.dataset.armed){S.rounds=S.rounds.filter(r=>r.id!==b.dataset.del);save();renderAll();toast('Ronda borrada')}
+  else{b.dataset.armed=1;b.textContent='¿Seguro?';b.classList.add('warn');setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='Borrar';b.classList.remove('warn')}},3000)}
+});
+
+/* ---------- Cerrar día ---------- */
+function renderControl(){
+  document.getElementById('dayTag').textContent=S.day1Closed?'Día 2 en curso · Día 1 cerrado':'Día 1 en curso';
+  const b=document.getElementById('btnCloseDay');
+  b.textContent=S.day1Closed?'Reabrir día 1':'Cerrar día 1';
+  b.className=S.day1Closed?'btn ghost':'btn';
+  document.getElementById('elimCount').disabled=S.day1Closed;
+  const d1=S.groups.filter(g=>g.day==1).map(g=>g.name), d2=S.groups.filter(g=>g.day==2).map(g=>g.name);
+  const cnt=id=>S.clans.filter(c=>c.groupId===id).length;
+  document.getElementById('fmtA').textContent=S.groups.filter(g=>g.day==1).map(g=>`${g.name} · ${cnt(g.id)} clanes`).join(' / ')||'Sin grupo';
+  document.getElementById('fmtB').textContent=S.groups.filter(g=>g.day==2).map(g=>`${g.name} · ${cnt(g.id)} clanes`).join(' / ')||'Sin grupo';
+  document.getElementById('subline').textContent=`Jueves 22: ${d1.join(', ')||'—'} · Viernes 23: ${d2.join(', ')||'—'} · puntos acumulados`;
+}
+function day1Candidates(){
+  const t=totals();
+  const d1g=new Set(S.groups.filter(g=>g.day==1).map(g=>g.id));
+  const played=new Set(S.rounds.filter(r=>r.day==1).flatMap(r=>r.results.filter(x=>x.played).map(x=>x.clanId)));
+  return S.clans.filter(c=>!c.eliminated&&(d1g.has(c.groupId)||played.has(c.id))).sort((a,b)=>(t[a.id].pts-t[b.id].pts)||(t[a.id].kills-t[b.id].kills));
+}
+document.getElementById('btnCloseDay').addEventListener('click',()=>{
+  if(!guard())return;
+  if(S.day1Closed){S.clans.forEach(c=>{if(c.elimDay1)c.eliminated=false,delete c.elimDay1});S.day1Closed=false;save();renderAll();toast('Día 1 reabierto');return}
+  const n=Math.max(0,+document.getElementById('elimCount').value||0);
+  const out=day1Candidates().slice(0,n);
+  document.getElementById('closeMsg').textContent=out.length?`Se eliminarán: ${out.map(c=>c.name).join(', ')}.`:'No hay parejas para eliminar. ¿Cerrar igual?';
+  document.getElementById('closeConfirm').hidden=false;
+});
+document.getElementById('btnCloseNo').addEventListener('click',()=>document.getElementById('closeConfirm').hidden=true);
+document.getElementById('btnCloseYes').addEventListener('click',()=>{
+  if(!guard())return;
+  const n=Math.max(0,+document.getElementById('elimCount').value||0);
+  day1Candidates().slice(0,n).forEach(c=>{c.eliminated=true;c.elimDay1=true});
+  S.day1Closed=true;save();document.getElementById('closeConfirm').hidden=true;
+  document.getElementById('rDay').value='2';renderAll();toast('Día 1 cerrado');
+});
+
+/* ---------- Ronda ---------- */
+let draft=null;
+function buildRound(){
+  const gs=document.getElementById('rGroup');const cur=gs.value;
+  gs.innerHTML=S.groups.map(g=>`<option value="${g.id}">${esc(g.name)} (Día ${g.day})</option>`).join('')+'<option value="__active">Todas las parejas activas</option>';
+  if([...gs.options].some(o=>o.value===cur))gs.value=cur;
+  else{const g=S.groups.find(g=>g.day==(S.day1Closed?2:1));if(g)gs.value=g.id}
+  document.getElementById('rDay').value=S.day1Closed?'2':'1';
+  resetDraft();
+}
+function resetDraft(){
+  const gid=document.getElementById('rGroup').value;
+  const cl=S.clans.filter(c=>!c.eliminated&&(gid==='__active'||c.groupId===gid));
+  draft=cl.map(c=>({clanId:c.id,surv:0,kills:0,killAll:false,played:true}));
+  renderRound();
+}
+function renderRound(){
+  const el=document.getElementById('roundRows');
+  if(!draft.length){el.innerHTML='<div class="empty">Este grupo no tiene parejas activas. Agrégalas en <b>Grupos y parejas</b>.</div>';document.getElementById('soloNote').hidden=true;return}
+  const map=document.getElementById('rMap').value;
+  const sc=scoreRound({map,results:draft});
+  el.innerHTML=draft.map((x,i)=>{const c=S.clans.find(c=>c.id===x.clanId);
+    return `<div class="rr" data-i="${i}">
+      <div class="nm"><b>${esc(c.name)}</b><small>${esc(c.p1||'—')} & ${esc(c.p2||'—')}</small></div>
+      <div class="f">Sobreviven<div class="seg">${[0,1,2].map(v=>`<button type="button" data-surv="${v}" class="${x.surv==v?'on':''}" aria-pressed="${x.surv==v}">${v}</button>`).join('')}</div></div>
+      <div class="f"><label for="k${i}" style="all:unset">Kills</label><input id="k${i}" type="number" min="0" value="${x.kills}" data-kills></div>
+      <div class="f"><label for="ka${i}" style="all:unset">Kill a todos</label><input id="ka${i}" type="checkbox" ${x.killAll?'checked':''} data-ka></div>
+      <div class="f"><label for="pl${i}" style="all:unset">Participó</label><input id="pl${i}" type="checkbox" ${x.played?'checked':''} data-pl></div>
+      <div class="live">+${sc[i].pts}</div></div>`}).join('');
+  const tot=draft.filter(x=>x.played).reduce((a,x)=>a+x.surv,0);
+  const n=document.getElementById('soloNote');
+  n.hidden=tot!==1;
+  n.innerHTML='★ Solo sobrevivió <strong>un único tripulante</strong> en la ronda: se le cuenta como pareja (<strong>+5</strong> en vez de +2).';
+}
+document.getElementById('roundRows').addEventListener('click',e=>{
+  const b=e.target.closest('[data-surv]');if(!b)return;
+  const i=+b.closest('.rr').dataset.i;draft[i].surv=+b.dataset.surv;renderRound();
+});
+document.getElementById('roundRows').addEventListener('change',e=>{
+  const row=e.target.closest('.rr');if(!row)return;const x=draft[+row.dataset.i];
+  if(e.target.matches('[data-kills]'))x.kills=Math.max(0,parseInt(e.target.value)||0);
+  if(e.target.matches('[data-ka]'))x.killAll=e.target.checked;
+  if(e.target.matches('[data-pl]')){x.played=e.target.checked;if(!x.played){x.surv=0;x.kills=0;x.killAll=false}}
+  renderRound();
+});
+document.getElementById('rGroup').addEventListener('change',resetDraft);
+document.getElementById('rMap').addEventListener('change',renderRound);
+document.getElementById('btnResetRound').addEventListener('click',resetDraft);
+document.getElementById('btnSaveRound').addEventListener('click',()=>{
+  if(!guard())return;
+  if(!draft.length){toast('No hay parejas en este grupo');return}
+  S.rounds.push({id:uid(),groupId:document.getElementById('rGroup').value,day:+document.getElementById('rDay').value,map:document.getElementById('rMap').value,ts:Date.now(),results:draft.map(x=>({...x}))});
+  save();renderAll();resetDraft();toast('Ronda guardada');
+});
+
+/* ---------- Grupos ---------- */
+function renderGroups(){
+  const cs=document.getElementById('cGroup');const cur=cs.value;
+  cs.innerHTML=S.groups.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('');
+  if([...cs.options].some(o=>o.value===cur))cs.value=cur;
+  const el=document.getElementById('groupsList');
+  if(!S.groups.length){el.innerHTML='<div class="empty">No hay grupos. Crea el primero con el formulario.</div>';return}
+  const t=totals();
+  el.innerHTML=S.groups.map(g=>{const cl=S.clans.filter(c=>c.groupId===g.id);
+    return `<div class="group-card"><header><span class="gname">${esc(g.name)}</span>
+      <span class="row-actions"><span class="chip">Día ${g.day} · ${g.day==1?'Jueves 22':'Viernes 23'}</span><span class="chip dim">${cl.length} clanes</span>
+      <button class="btn sm ghost" data-delg="${g.id}">Borrar grupo</button></span></header>
+      ${cl.map(c=>`<div class="clan-line"><span>${esc(c.name)} <small>· ${esc(c.p1||'—')} & ${esc(c.p2||'—')} · ${t[c.id].pts} pts${c.eliminated?' · eliminada':''}</small></span>
+        <button class="btn sm ghost" data-delc="${c.id}">Quitar</button></div>`).join('')||'<div class="clan-line"><small>Sin parejas todavía.</small></div>'}
+    </div>`}).join('');
+}
+function arm(b,label,fn){if(b.dataset.armed){fn()}else{b.dataset.armed=1;const o=b.textContent;b.textContent=label;b.classList.add('warn');setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=o;b.classList.remove('warn')}},3000)}}
+document.getElementById('groupsList').addEventListener('click',e=>{
+  const g=e.target.closest('[data-delg]'),c=e.target.closest('[data-delc]');
+  if(!guard())return;
+  if(g)arm(g,'¿Borrar con sus parejas?',()=>{const ids=new Set(S.clans.filter(c=>c.groupId===g.dataset.delg).map(c=>c.id));S.groups=S.groups.filter(x=>x.id!==g.dataset.delg);S.clans=S.clans.filter(c=>!ids.has(c.id));S.sample=false;save();renderAll();toast('Grupo borrado')});
+  if(c)arm(c,'¿Quitar?',()=>{S.clans=S.clans.filter(x=>x.id!==c.dataset.delc);S.sample=false;save();renderAll();toast('Pareja quitada')});
+});
+document.getElementById('formGroup').addEventListener('submit',e=>{
+  e.preventDefault();if(!guard())return;const n=document.getElementById('gName').value.trim();if(!n)return;
+  S.groups.push({id:uid(),name:n,day:+document.getElementById('gDay').value});S.sample=false;
+  document.getElementById('gName').value='';save();renderAll();document.getElementById('cGroup').value=S.groups.at(-1).id;toast('Grupo agregado');
+});
+document.getElementById('formClan').addEventListener('submit',e=>{
+  e.preventDefault();if(!guard())return;const n=document.getElementById('cName').value.trim();const g=document.getElementById('cGroup').value;
+  if(!g){toast('Primero crea un grupo');return}if(!n)return;
+  S.clans.push({id:uid(),name:n,p1:document.getElementById('cP1').value.trim(),p2:document.getElementById('cP2').value.trim(),groupId:g,eliminated:false});S.sample=false;
+  ['cName','cP1','cP2'].forEach(i=>document.getElementById(i).value='');save();renderAll();toast('Pareja agregada');document.getElementById('cName').focus();
+});
+document.getElementById('btnSample').addEventListener('click',()=>{if(!guard())return;S=sample();save();renderAll();toast('Ejemplo cargado')});
+document.getElementById('btnWipe').addEventListener('click',()=>{if(guard())document.getElementById('wipeConfirm').hidden=false});
+document.getElementById('btnWipeNo').addEventListener('click',()=>document.getElementById('wipeConfirm').hidden=true);
+document.getElementById('btnWipeYes').addEventListener('click',()=>{if(!guard())return;S={groups:[],clans:[],rounds:[],day1Closed:false};save();document.getElementById('wipeConfirm').hidden=true;renderAll();toast('Todo borrado')});
+
+function renderAll(opts={}){
+  renderAuth();
+  if(!isAdmin()&&(!document.getElementById('tab-ronda').hidden||!document.getElementById('tab-grupos').hidden))showTab('tabla');
+  renderBoard();renderHistory();renderControl();renderGroups();
+  if(!document.getElementById('tab-ronda').hidden&&!opts.keepDraft)buildRound();
+}
+(async()=>{
+  try{
+    const d=await load();S=d.state;REV=d.rev;
+    if(HASH&&kept()===HASH)ADMIN=true;
+  }catch(e){toast('No se pudo cargar el torneo')}
+  document.getElementById('localNote').hidden=!LOCAL;
+  renderAll();
+  setInterval(poll,5000);
+})();
+
+</script>
+</body>
+</html>
