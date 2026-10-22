@@ -157,7 +157,8 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--red)}
     <h2 id="authTitle">Acceso de administrador</h2>
     <p class="hint" id="authHint"></p>
     <form class="form cols" id="formAuth">
-      <label for="aPass">Clave de administrador<input id="aPass" type="password" autocomplete="current-password" required></label>
+      <label for="aUser">Usuario<input id="aUser" autocomplete="username" maxlength="30" required></label>
+      <label for="aPass">Clave<input id="aPass" type="password" autocomplete="current-password" required></label>
       <div class="row-actions"><button class="btn" type="submit" id="authSubmit">Entrar</button><button class="btn ghost" type="button" id="btnAuthCancel">Cancelar</button></div>
     </form>
   </div>
@@ -232,14 +233,6 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--red)}
   <!-- GRUPOS -->
   <section id="tab-grupos" class="grid2 admin-only" hidden>
     <div class="stack">
-      <div class="panel">
-        <h2>Clave de administrador</h2>
-        <span class="tag">Cambia la clave para editar el torneo</span>
-        <form class="form cols" id="formAdmin">
-          <label for="adPass">Nueva clave<input id="adPass" type="password" autocomplete="new-password" required></label>
-          <button class="btn" type="submit">Cambiar clave</button>
-        </form>
-      </div>
       <div class="panel">
         <h2>Agregar grupo</h2>
         <form class="form cols" id="formGroup">
@@ -359,11 +352,15 @@ function sample(){
 // Vacío = modo local: los datos solo existen en este navegador.
 const DB_URL='';
 const LOCAL=!DB_URL, base=DB_URL.replace(/\/+$/,'');
-let S={groups:[],clans:[],rounds:[],day1Closed:false}, REV=0, ADMIN=false, HASH=null;
+let S={groups:[],clans:[],rounds:[],day1Closed:false}, REV=0, ADMIN=false, ADMIN_REC=null;
 const KEY='torneo:key';
 const keep=h=>{try{h?localStorage.setItem(KEY,h):localStorage.removeItem(KEY)}catch(e){}};
 const kept=()=>{try{return localStorage.getItem(KEY)}catch(e){return null}};
-async function sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('torneo-escondite:'+t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function hashPw(user,pw){
+  const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']);
+  const b=await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',iterations:100000,salt:new TextEncoder().encode('torneo-escondite:'+user.toLowerCase())},k,256);
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
 async function dbGet(path){
   if(LOCAL){try{return JSON.parse(localStorage.getItem('torneo:'+path))}catch(e){return null}}
   const r=await fetch(`${base}/${path}.json`,{cache:'no-store'});
@@ -376,8 +373,8 @@ async function dbPut(path,val){
   if(!r.ok)throw new Error('http '+r.status);
 }
 async function load(){
-  const [t,h]=await Promise.all([dbGet('torneo'),dbGet('adminHash')]);
-  HASH=h||null;
+  const [t,a]=await Promise.all([dbGet('torneo'),dbGet('admin')]);
+  ADMIN_REC=a&&a.user&&a.hash?a:null;
   const st=(t&&t.state)||{};
   return {rev:(t&&t.rev)||0,state:{...st,groups:st.groups||[],clans:st.clans||[],rounds:st.rounds||[],day1Closed:!!st.day1Closed,sample:!!st.sample}};
 }
@@ -396,7 +393,15 @@ function save(){
 }
 async function poll(){
   if(pending)return;
-  try{const d=await load();if(!pending&&d.rev!==REV){S=d.state;REV=d.rev;renderAll({keepDraft:true})}}catch(e){}
+  const before=JSON.stringify(ADMIN_REC);
+  try{const d=await load();if(!pending&&(d.rev!==REV||JSON.stringify(ADMIN_REC)!==before)){S=d.state;REV=d.rev;renderAll({keepDraft:true})}}catch(e){}
+}
+// Tiempo real: Firebase avisa al instante cuando cambia el torneo (el sondeo cada 15 s queda de respaldo).
+function live(){
+  if(LOCAL||!window.EventSource)return;
+  const es=new EventSource(`${base}/torneo/rev.json`);
+  es.addEventListener('put',poll);
+  es.addEventListener('patch',poll);
 }
 
 function toast(t){const el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
@@ -439,15 +444,15 @@ document.getElementById('tabs').addEventListener('click',e=>{
   showTab(b.dataset.tab);
 });
 
-/* ---------- Acceso de administrador (una sola clave) ---------- */
+/* ---------- Acceso de administrador (usuario único y definitivo) ---------- */
 function renderAuth(){
-  const first=!HASH;
+  const first=!ADMIN_REC;
   document.body.classList.toggle('is-admin',ADMIN);
   document.getElementById('authBar').innerHTML=ADMIN
-    ?`<span>Modo administrador</span><button class="btn sm ghost" data-auth="logout">Cerrar sesión</button>`
-    :`<span>Modo espectador</span><button class="btn sm ghost" data-auth="show">${first?'Crear clave de administrador':'Acceso administrador'}</button>`;
-  document.getElementById('authTitle').textContent=first?'Crear clave de administrador':'Acceso de administrador';
-  document.getElementById('authHint').textContent=first?'Aún no hay clave. La primera que crees será la de administrador.':'Solo quien tiene la clave puede registrar rondas, editar grupos y manejar el torneo.';
+    ?`<span>Administrador: <b>${esc(ADMIN_REC.user)}</b></span><button class="btn sm ghost" data-auth="logout">Cerrar sesión</button>`
+    :`<span>Modo espectador</span><button class="btn sm ghost" data-auth="show">${first?'Crear administrador':'Entrar como administrador'}</button>`;
+  document.getElementById('authTitle').textContent=first?'Crear administrador':'Acceso de administrador';
+  document.getElementById('authHint').textContent=first?'Aún no hay administrador. El usuario y la clave que crees ahora serán definitivos: no se podrán cambiar ni crear otros.':'Solo el administrador puede registrar rondas, editar grupos y manejar el torneo.';
   document.getElementById('authSubmit').textContent=first?'Crear y entrar':'Entrar';
   document.getElementById('aPass').autocomplete=first?'new-password':'current-password';
   if(ADMIN)document.getElementById('authPanel').hidden=true;
@@ -455,30 +460,23 @@ function renderAuth(){
 document.getElementById('authBar').addEventListener('click',e=>{
   const b=e.target.closest('[data-auth]');if(!b)return;
   if(b.dataset.auth==='logout'){ADMIN=false;keep(null);renderAll();toast('Sesión cerrada')}
-  else{const p=document.getElementById('authPanel');p.hidden=!p.hidden;if(!p.hidden)document.getElementById('aPass').focus()}
+  else{const p=document.getElementById('authPanel');p.hidden=!p.hidden;if(!p.hidden)document.getElementById('aUser').focus()}
 });
 document.getElementById('btnAuthCancel').addEventListener('click',()=>document.getElementById('authPanel').hidden=true);
 document.getElementById('formAuth').addEventListener('submit',async e=>{
   e.preventDefault();
-  const pw=document.getElementById('aPass').value;if(!pw)return;
+  const user=document.getElementById('aUser').value.trim(), pw=document.getElementById('aPass').value;
+  if(!user||!pw)return;
   try{
-    HASH=(await dbGet('adminHash'))||null;
-    const h=await sha(pw);
-    if(!HASH){
+    const a=await dbGet('admin');
+    ADMIN_REC=a&&a.user&&a.hash?a:null;
+    const h=await hashPw(user,pw);
+    if(!ADMIN_REC){
       if(pw.length<4){toast('La clave debe tener al menos 4 caracteres');return}
-      await dbPut('adminHash',h);HASH=h;
-    }else if(h!==HASH){toast('Clave incorrecta');return}
-    ADMIN=true;keep(h);document.getElementById('formAuth').reset();renderAll();toast('Bienvenido, administrador');
+      await dbPut('admin',{user,hash:h});ADMIN_REC={user,hash:h};
+    }else if(user.toLowerCase()!==ADMIN_REC.user.toLowerCase()||h!==ADMIN_REC.hash){toast('Usuario o clave incorrectos');renderAll();return}
+    ADMIN=true;keep(ADMIN_REC.hash);document.getElementById('formAuth').reset();renderAll();toast('Bienvenido, '+ADMIN_REC.user);
   }catch(err){toast('No se pudo conectar con la base de datos')}
-});
-
-/* ---------- Cambiar clave ---------- */
-document.getElementById('formAdmin').addEventListener('submit',async e=>{
-  e.preventDefault();if(!guard())return;
-  const pw=document.getElementById('adPass').value;
-  if(pw.length<4){toast('La clave debe tener al menos 4 caracteres');return}
-  try{const h=await sha(pw);await dbPut('adminHash',h);HASH=h;keep(h);e.target.reset();toast('Clave cambiada')}
-  catch(err){toast('No se pudo cambiar la clave')}
 });
 
 /* ---------- Leaderboard ---------- */
@@ -657,11 +655,12 @@ function renderAll(opts={}){
 (async()=>{
   try{
     const d=await load();S=d.state;REV=d.rev;
-    if(HASH&&kept()===HASH)ADMIN=true;
+    if(ADMIN_REC&&kept()===ADMIN_REC.hash)ADMIN=true;
   }catch(e){toast('No se pudo cargar el torneo')}
   document.getElementById('localNote').hidden=!LOCAL;
   renderAll();
-  setInterval(poll,5000);
+  live();
+  setInterval(poll,15000);
 })();
 
 </script>
