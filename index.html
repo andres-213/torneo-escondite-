@@ -237,7 +237,7 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--red)}
         <h2>Agregar grupo</h2>
         <form class="form cols" id="formGroup">
           <label for="gName">Nombre del grupo<input id="gName" placeholder="Grupo C" required></label>
-          <label for="gDay">Juega el<select id="gDay"><option value="1">Día 1 · Jueves 22</option><option value="2">Día 2 · Viernes 23</option></select></label>
+          <p class="hint" style="align-self:end;margin:0">Cada grupo juega el <b>Día 1 · Jueves 22</b> y el <b>Día 2 · Viernes 23</b> (los eliminados no continúan).</p>
           <button class="btn" type="submit">Agregar grupo</button>
         </form>
       </div>
@@ -298,8 +298,8 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--red)}
         <h2>Formato del torneo</h2>
         <span class="tag">2 días · 2 grupos diferentes</span>
         <div class="days">
-          <div class="day"><div class="dh">Primer día</div><div class="chips"><span class="chip">Jueves 22 Oct</span><span class="chip dim" id="fmtA">Grupo A</span></div><p>Todas las parejas compiten y se registran sus puntos.</p><p>Al final del primer día <strong>las 4 últimas parejas</strong> de la tabla serán eliminadas del torneo.</p></div>
-          <div class="day"><div class="dh">Segundo día</div><div class="chips"><span class="chip">Viernes 23 Oct</span><span class="chip dim" id="fmtB">Grupo B</span></div><p>Las parejas restantes compiten y continúan sumando puntos.</p><p><strong>Gana el clan</strong> que tenga el mejor puntaje acumulado de ambos días.</p></div>
+          <div class="day"><div class="dh">Primer día</div><div class="chips"><span class="chip">Jueves 22 Oct</span><span class="chip dim" id="fmtA">Grupo A</span></div><p>Compiten los grupos A y B y se registran sus puntos.</p><p>Al final del primer día <strong>las 4 últimas parejas</strong> de la tabla serán eliminadas del torneo.</p></div>
+          <div class="day"><div class="dh">Segundo día</div><div class="chips"><span class="chip">Viernes 23 Oct</span><span class="chip dim" id="fmtB">Grupo B</span></div><p>Compiten los grupos A y B juntos (solo las parejas que continúan) y siguen sumando puntos.</p><p><strong>Gana el clan</strong> que tenga el mejor puntaje acumulado de ambos días.</p></div>
         </div>
         <h3 style="margin-top:18px">Importante</h3>
         <ul class="check">
@@ -523,17 +523,15 @@ function renderControl(){
   b.textContent=S.day1Closed?'Reabrir día 1':'Cerrar día 1';
   b.className=S.day1Closed?'btn ghost':'btn';
   document.getElementById('elimCount').disabled=S.day1Closed;
-  const d1=S.groups.filter(g=>g.day==1).map(g=>g.name), d2=S.groups.filter(g=>g.day==2).map(g=>g.name);
+  const d1=S.groups.map(g=>g.name), d2=d1;
   const cnt=id=>S.clans.filter(c=>c.groupId===id).length;
-  document.getElementById('fmtA').textContent=S.groups.filter(g=>g.day==1).map(g=>`${g.name} · ${cnt(g.id)} clanes`).join(' / ')||'Sin grupo';
-  document.getElementById('fmtB').textContent=S.groups.filter(g=>g.day==2).map(g=>`${g.name} · ${cnt(g.id)} clanes`).join(' / ')||'Sin grupo';
+  document.getElementById('fmtA').textContent=S.groups.map(g=>`${g.name} · ${cnt(g.id)} clanes`).join(' / ')||'Sin grupo';
+  document.getElementById('fmtB').textContent=S.groups.map(g=>`${g.name} · ${S.clans.filter(c=>c.groupId===g.id&&!c.eliminated).length} clanes`).join(' / ')||'Sin grupo';
   document.getElementById('subline').textContent=`Jueves 22: ${d1.join(', ')||'—'} · Viernes 23: ${d2.join(', ')||'—'} · puntos acumulados`;
 }
 function day1Candidates(){
   const t=totals();
-  const d1g=new Set(S.groups.filter(g=>g.day==1).map(g=>g.id));
-  const played=new Set(S.rounds.filter(r=>r.day==1).flatMap(r=>r.results.filter(x=>x.played).map(x=>x.clanId)));
-  return S.clans.filter(c=>!c.eliminated&&(d1g.has(c.groupId)||played.has(c.id))).sort((a,b)=>(t[a.id].pts-t[b.id].pts)||(t[a.id].kills-t[b.id].kills));
+  return S.clans.filter(c=>!c.eliminated).sort((a,b)=>(t[a.id].pts-t[b.id].pts)||(t[a.id].kills-t[b.id].kills));
 }
 document.getElementById('btnCloseDay').addEventListener('click',()=>{
   if(!guard())return;
@@ -556,9 +554,9 @@ document.getElementById('btnCloseYes').addEventListener('click',()=>{
 let draft=null;
 function buildRound(){
   const gs=document.getElementById('rGroup');const cur=gs.value;
-  gs.innerHTML=S.groups.map(g=>`<option value="${g.id}">${esc(g.name)} (Día ${g.day})</option>`).join('')+'<option value="__active">Todas las parejas activas</option>';
+  gs.innerHTML=S.groups.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('')+'<option value="__active">Todas las parejas activas</option>';
   if([...gs.options].some(o=>o.value===cur))gs.value=cur;
-  else{const g=S.groups.find(g=>g.day==(S.day1Closed?2:1));if(g)gs.value=g.id}
+  else if(S.groups[0])gs.value=S.groups[0].id
   document.getElementById('rDay').value=S.day1Closed?'2':'1';
   resetDraft();
 }
@@ -617,7 +615,7 @@ function renderGroups(){
   const t=totals();
   el.innerHTML=S.groups.map(g=>{const cl=S.clans.filter(c=>c.groupId===g.id);
     return `<div class="group-card"><header><span class="gname">${esc(g.name)}</span>
-      <span class="row-actions"><span class="chip">Día ${g.day} · ${g.day==1?'Jueves 22':'Viernes 23'}</span><span class="chip dim">${cl.length} clanes</span>
+      <span class="row-actions"><span class="chip">Jueves 22 y Viernes 23</span><span class="chip dim">${cl.length} clanes</span>
       <button class="btn sm ghost" data-delg="${g.id}">Borrar grupo</button></span></header>
       ${cl.map(c=>`<div class="clan-line"><span>${esc(c.name)} <small>· ${esc(c.p1||'—')} & ${esc(c.p2||'—')} · ${t[c.id].pts} pts${c.eliminated?' · eliminada':''}</small></span>
         <button class="btn sm ghost" data-delc="${c.id}">Quitar</button></div>`).join('')||'<div class="clan-line"><small>Sin parejas todavía.</small></div>'}
@@ -632,7 +630,7 @@ document.getElementById('groupsList').addEventListener('click',e=>{
 });
 document.getElementById('formGroup').addEventListener('submit',e=>{
   e.preventDefault();if(!guard())return;const n=document.getElementById('gName').value.trim();if(!n)return;
-  S.groups.push({id:uid(),name:n,day:+document.getElementById('gDay').value});S.sample=false;
+  S.groups.push({id:uid(),name:n});S.sample=false;
   document.getElementById('gName').value='';save();renderAll();document.getElementById('cGroup').value=S.groups.at(-1).id;toast('Grupo agregado');
 });
 document.getElementById('formClan').addEventListener('submit',e=>{
