@@ -289,7 +289,6 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--red)}
           <div class="rule"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="11" fill="#b3101e"/><ellipse cx="20" cy="20" rx="17" ry="5" fill="none" stroke="#ff8a93" stroke-width="2" transform="rotate(-20 20 20)"/></svg><div><b>Sobrevive con tu pareja</b><small>Solo en el mapa Skeld.</small></div><div class="pts">+10<em>puntos</em></div></div>
           <div class="rule"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="11" fill="#b3101e"/><ellipse cx="20" cy="20" rx="17" ry="5" fill="none" stroke="#ff8a93" stroke-width="2" transform="rotate(-20 20 20)"/></svg><div><b>Sobrevive solo</b><small>Solo en el mapa Skeld.</small></div><div class="pts">+5<em>puntos</em></div></div>
           <div class="rule"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="11" fill="#b3101e"/><ellipse cx="20" cy="20" rx="17" ry="5" fill="none" stroke="#ff8a93" stroke-width="2" transform="rotate(-20 20 20)"/></svg><div><b>Solo participó</b><small>Solo en el mapa Skeld.</small></div><div class="pts">+1<em>punto</em></div></div>
-          <div class="note">★ Si sobrevive un <strong>único tripulante</strong> en toda la ronda, se le toma como puntaje de pareja: <strong>+5 puntos</strong> en vez de los +2 que le corresponderían.</div>
         </div>
       </div>
     </div>
@@ -412,13 +411,12 @@ function guard(){if(isAdmin())return true;toast('Solo un administrador puede hac
 
 /* ---------- Puntaje ---------- */
 function scoreRound(round){
-  const total=round.results.filter(x=>x.played).reduce((a,x)=>a+(+x.surv||0),0);
   const skeld=round.map==='Skeld';
   return round.results.map(x=>{
     const items=[];let pts=0;const add=(p,t)=>{pts+=p;items.push(`${t} +${p}`)};
     if(!x.played) return {clanId:x.clanId,pts:0,items:['No participó']};
     if(x.surv==2)add(5,'Sobrevive la pareja');
-    else if(x.surv==1){ if(total===1)add(5,'Único tripulante (cuenta como pareja)'); else add(2,'Sobrevive 1 solo'); }
+    else if(x.surv==1)add(2,'Sobrevive 1 solo');
     if(x.kills>0)add(3*x.kills,`${x.kills} kill${x.kills>1?'s':''}`);
     if(x.killAll){add(20,'Kill a todos');add(10,'Recompensa');}
     if(skeld){ if(x.surv==2)add(10,'Bonus Skeld pareja'); else if(x.surv==1)add(5,'Bonus Skeld solo'); else add(1,'Bonus Skeld participó'); }
@@ -579,10 +577,7 @@ function renderRound(){
       <div class="f"><label for="ka${i}" style="all:unset">Kill a todos</label><input id="ka${i}" type="checkbox" ${x.killAll?'checked':''} data-ka></div>
       <div class="f"><label for="pl${i}" style="all:unset">Participó</label><input id="pl${i}" type="checkbox" ${x.played?'checked':''} data-pl></div>
       <div class="live">+${sc[i].pts}</div></div>`}).join('');
-  const tot=draft.filter(x=>x.played).reduce((a,x)=>a+x.surv,0);
-  const n=document.getElementById('soloNote');
-  n.hidden=tot!==1;
-  n.innerHTML='★ Solo sobrevivió <strong>un único tripulante</strong> en la ronda: se le cuenta como pareja (<strong>+5</strong> en vez de +2).';
+  document.getElementById('soloNote').hidden=true;
 }
 document.getElementById('roundRows').addEventListener('click',e=>{
   const b=e.target.closest('[data-surv]');if(!b)return;
